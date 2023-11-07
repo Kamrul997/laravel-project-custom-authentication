@@ -1,6 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +16,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/todos/home', [HomeController::class, 'todoHome'])->name('homePage');
+    Route::post('/login', [AuthController::class, 'authenticate'])->name('login.user');
+});
+
+
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout.user');
+Route::post('/register', [AuthController::class, 'register'])->name('register.user');
+
+Route::get('/create',[HomeController::class, 'create'])->name('createPage');
